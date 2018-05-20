@@ -32,6 +32,7 @@
         </div>
       </form>
     </main>
+    <div id="hotKeyWords" style="float:right; margin-right: 15%;"><h5>热门搜索</h5></div>
 
     <footer class="footer">
       <div class="container">
@@ -61,6 +62,17 @@
                   }
               });
           }, 1000);
+
+          $.ajax({
+              url: "http://localhost:8080/loadHot",
+              dataType: "json",
+              type: "GET",
+              success: function (data) {
+                  data.forEach(function (item, index) {
+                      $("#hotKeyWords").append('<h6>' + item.hotKey + '</h6>')
+                  });
+              }
+          });
       })
     </script>
   </body>
