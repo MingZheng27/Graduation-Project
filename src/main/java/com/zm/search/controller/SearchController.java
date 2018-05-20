@@ -1,6 +1,7 @@
 package com.zm.search.controller;
 
 import com.google.common.collect.Lists;
+import com.mysql.jdbc.StringUtils;
 import com.zm.search.bean.DetailSearchRequest;
 import com.zm.search.bean.DetailSearchResponse;
 import com.zm.search.bean.HotKey;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -38,6 +40,9 @@ public class SearchController {
     public ResponseEntity<List<String>> loadTitle(HttpServletRequest request) {
         try {
             DetailSearchRequest req = CommonFunc.convertStream2Object(request.getInputStream());
+            if (StringUtils.isNullOrEmpty(req.getKeyWords())) {
+                return new ResponseEntity<>(Lists.newArrayList(), HttpStatus.OK);
+            }
             if (null != req) {
                 List<String> resultList = service.loadTitle(req.getKeyWords());
                 return new ResponseEntity<>(resultList, HttpStatus.OK);
@@ -82,6 +87,17 @@ public class SearchController {
             e.printStackTrace();
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @RequestMapping(value = "/index.html")
+    public String forwardIndex(Model model) {
+        return "index";
+    }
+
+    @RequestMapping(value = "/detail.html")
+    public String forwardDetail(HttpServletRequest req, Model model) {
+        model.addAttribute("keyWords", req.getParameter("keyWords"));
+        return "detail";
     }
 
 }

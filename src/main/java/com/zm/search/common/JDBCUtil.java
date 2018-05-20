@@ -25,7 +25,6 @@ public class JDBCUtil {
 						conn = (Connection) DriverManager.getConnection(url, username, password);
 						conn.setEncoding("UTF-8");
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}

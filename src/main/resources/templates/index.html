@@ -1,0 +1,67 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" th:href="@{../../../../favicon.ico}">
+
+    <title>Sticky Footer Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link th:href="@{dist/css/bootstrap.min.css}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link th:href="@{dist/css/sticky-footer.css}" rel="stylesheet">
+    <link th:href="@{dist/css/autoinput.css}" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <!-- Begin page content -->
+    <main role="main" class="container">
+      <h1 class="mt-5">Z search</h1>
+      <p class="lead">An Search Engine based on Elastic Search</p>
+      <form action="/detail.html" method="post">
+        <input type="text" id="input" class="auto-inp" name="keyWords">
+        <input type="submit" class="btn btn-sm btn-primary">
+        <div class="auto hidden" id="auto">
+          <div class="auto_out">1</div>
+          <div class="auto_out">2</div>
+        </div>
+      </form>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <span class="text-muted">Maded by mingzheng</span>
+      </div>
+    </footer>
+    <script th:src="@{dist/js/jquery.js}"></script>
+    <script th:src="@{dist/js/bootstrap.js}"></script>
+    <script th:src="@{dist/js/auto.js}"></script>
+    <script>
+      $(function () {
+          setInterval(function () {
+              var requestData = new Object();
+              requestData.keyWords = $("#input").val();
+              $.ajax({
+                  url: "http://localhost:8080/loadTitle",
+                  dataType: "json",
+                  data: JSON.stringify(requestData),
+                  type: "POST",
+                  headers: {"Content-Type": "application/json"},
+                  success: function (data) {
+                      var array = data;
+                      var autoComplete = new AutoComplete("input", "auto", array);
+                      document.getElementById("input").onkeyup = function (event) {
+                          autoComplete.start(event);
+                      }
+                  }
+              });
+          }, 1000);
+      })
+    </script>
+  </body>
+</html>

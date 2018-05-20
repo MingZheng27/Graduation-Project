@@ -1,0 +1,121 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" th:href="@{../../../../favicon.ico}">
+
+    <title>Sticky Footer Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link th:href="@{dist/css/bootstrap.min.css}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link th:href="@{dist/css/sticky-footer.css}" rel="stylesheet">
+    <link th:href="@{dist/css/autoinput.css}" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- Begin page content -->
+<main role="main" class="container">
+    <h1 class="mt-5">Z search</h1>
+    <p class="lead">An Search Engine based on Elastic Search</p>
+    <form action="/detail.html" method="post">
+        <input type="text" id="input" class="auto-inp" th:value="${keyWords}" name="keyWords">
+        <input type="submit" class="btn btn-sm btn-primary">
+    </form>
+    <div id="details">
+
+    </div>
+    <a class="btn btn-sm btn-primary" id="preview">preview</a>
+    <div id="page" style="display: inline-block;"></div>
+    <a class="btn btn-sm btn-primary" id="next">next</a>
+
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <span class="text-muted">Maded by mingzheng</span>
+    </div>
+</footer>
+<script th:src="@{dist/js/jquery.js}"></script>
+<script th:src="@{dist/js/bootstrap.js}"></script>
+<script>
+    $(function () {
+        var offset = 0;
+
+        function addArtical(entity) {
+            $("#details").append('<h3><a href="https://zhuanlan.zhihu.com/p/' + entity.questionId +
+                '">' + entity.questionName + '</a></h3>')
+                .append('<h5>https://zhuanlan.zhihu.com/p/' + entity.questionId + '</h5>')
+                .append('<h6>' + entity.excerpt + '</h6>');
+        }
+
+        function addQuestionAndAnswer(entity) {
+            $("#details").append('<h3><a href="https://www.zhihu.com/question/' + entity.questionId + '/answer/' + entity.answerId + '">' + entity.questionName + '</h3>')
+                .append('<h5>https://www.zhihu.com/question/' + entity.questionId + '/answer/' + entity.questionId + '</h5>')
+                .append('<h6>' + entity.excerpt + '</h6>');
+        }
+
+        //todo: onclick offset++ or -- and reload data
+        function loadDetail() {
+            var requestData = new Object();
+            requestData.keyWords = $("#input").val();
+            requestData.from = offset * 10;
+            requestData.to = (parseInt(offset) + parseInt(1)) * 10;
+            $.ajax({
+                url: "http://localhost:8080/loadDetail",
+                dataType: "json",
+                data:JSON.stringify(requestData),
+                type: "POST",
+                headers:{"Content-Type": "application/json"},
+                success:function (data) {
+                    $("#details").empty();
+                    data.resultList.forEach(function (item, index) {
+                        if (item.isArtical) {
+                            addArtical(item);
+                        } else {
+                            addQuestionAndAnswer(item);
+                        }
+                    });
+                    $("#page").empty();
+                    for (var i = offset - 4 ;i < parseInt(offset) + 6 ;i++){
+                        if (i <= 0) {
+                            for (var j = 1 ; j < 11 ;j++){
+                                if (j == parseInt(offset) + 1) {
+                                    $("#page").append('<strong>' + j + '</strong> ')
+                                } else {
+                                    $("#page").append(j).append(" ");
+                                }
+                            }
+                            break;
+                        }
+                        if (i == parseInt(offset) + 1) {
+                            $("#page").append('<strong>' + i + '</strong> ')
+                        } else{
+                            $("#page").append(i).append(" ");
+                        }
+                    }
+                }
+            });
+        }
+
+        function preview() {
+            offset--;
+            loadDetail();
+        }
+
+        function next() {
+            offset++;
+            loadDetail();
+        }
+        loadDetail();
+        $("#preview").attr('onclick', '').click(preview);
+        $("#next").attr('onclick', '').click(next);
+    })
+</script>
+</body>
+</html>
