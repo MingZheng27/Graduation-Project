@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface Dao {
 
-    List<QAEntity> detailQuery(String keyWords, int from, int to);
+    List<QAEntity> detailQuery(String[] keyWords, int from, int to);
 
     List<String> queryTitle(String keyWords);
 

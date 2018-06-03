@@ -48,10 +48,21 @@ public class SearchService {
     public List<QAEntity> loadDetailResult(String keyWords, int from, int to) {
         Jedis client = RedisUtil.getInstance();
         String key = keyWords + ";" + from + ";" + to;
+        String[] keys = keyWords.split(" ");
+        for (String s : keys) {
+            if (!StringUtils.isNullOrEmpty(s)) {
+                Integer hotLevel = DaoImpl.cacheBuilder.asMap().get(s);
+                if (null == hotLevel || hotLevel.equals(0)) {
+                    DaoImpl.cacheBuilder.put(s,1);
+                } else {
+                    DaoImpl.cacheBuilder.put(s, hotLevel + 1);
+                }
+            }
+        }
         if (client.exists(key)) {
             return JSON.parseObject(client.get(key), List.class);
         }
-        List<QAEntity> resultList = dao.detailQuery(keyWords, from, to);
+        List<QAEntity> resultList = dao.detailQuery(keys, from, to);
         client.set(key, JSON.toJSONString(resultList));
         client.expire(key, 120);
         return resultList;

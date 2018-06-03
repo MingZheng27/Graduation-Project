@@ -61,18 +61,11 @@ public class DaoImpl implements Dao {
     TransportClient client;
 
     @Override
-    public List<QAEntity> detailQuery(String keyWords, int from, int to) {
+    public List<QAEntity> detailQuery(String[] keyWords, int from, int to) {
         List<QAEntity> resultList = Lists.newArrayList();
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
-        String[] keys = keyWords.split(" ");
-        for (String s : keys) {
+        for (String s : keyWords) {
             if (!StringUtils.isEmpty(s)) {
-                Integer hotLevel = cacheBuilder.asMap().get(s);
-                if (null == hotLevel || hotLevel.equals(0)) {
-                    cacheBuilder.put(s,1);
-                } else {
-                    cacheBuilder.put(s, hotLevel + 1);
-                }
                 boolQuery.should(QueryBuilders.matchQuery("question_name", s));
                 boolQuery.should(QueryBuilders.matchQuery("content", s));
                 boolQuery.should(QueryBuilders.matchQuery("username", s));
