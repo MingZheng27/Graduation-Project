@@ -4,7 +4,7 @@ import redis.clients.jedis.Jedis;
 
 public class RedisUtil {
 
-    private static Jedis jedisClient = null;
+    private static volatile Jedis jedisClient = null;
 
     private RedisUtil() {
     }
